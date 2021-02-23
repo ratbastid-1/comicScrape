@@ -24,7 +24,6 @@ The installation comes with a sample called scrapeConfig.json.SAMPLE. You should
 The shipping contents of scrapeConfig.json.SAMPLE are:
 
 {
-	"comments":"",
 	"siteUrl": "https://getcomics.info",
 	"queryFormat": "?s=",
 	"comicDirectory": "/Path/To/Comics",
@@ -41,15 +40,15 @@ The fields are:
 
 	* queryFormat - The structure of how to spell a query on GetComics, just incase ditto.
 
-	* comicsDirectory - The path on your local machine to where your comics folders live. Should be writeable by the user running this script.
+	* comicsDirectory - The path on your local machine to where your comics folders live. Must be writeable by the user running this script.
 
 	* ComicvineKey - Your own Comicvine API key. Get one for free at https://comicvine.com/api.
 
 	* titlesFile - The name of the file that contains your pull list series titles.
 
-	* maxPageDepth - How deep into GetComics' search results to go when backfilling a series.
+	* maxPageDepth - How deep into GetComics' search results to go when downloading a series from the beginning.
 
-	* onlyFirstPageForExistingSeries - If true, only look on the first page of search results for any series that it finds existing issues of. This speeds up execution because the latest issue will likely be on the first page.
+	* onlyFirstPageForExistingSeries - For comics we already have issues of, only look on the first page of search results for new issues, rather than going "maxPageDepth" deep. This speeds up execution because the latest issue will likely be on the first page.
 
 
 PULL LIST
