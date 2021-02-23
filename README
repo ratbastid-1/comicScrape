@@ -18,7 +18,7 @@ CONFIGURATION
 
 The scrapeConfig.json file contains the values necessary to configure comicScraper.php for your environment.
 
-The installation comes wiht a sample called scrapeConfig.json.SAMPLE. You should populate it with values appropriate to your system, and rename it to "scrapeConfig.json".
+The installation comes with a sample called scrapeConfig.json.SAMPLE. You should populate it with values appropriate to your system, and rename it to "scrapeConfig.json".
 
 
 The shipping contents of scrapeConfig.json.SAMPLE are:
@@ -49,7 +49,7 @@ The fields are:
 
 	* maxPageDepth - How deep into GetComics' search results to go when backfilling a series.
 
-	* onlyFirstPageForExistingSeries - If true, the script will only pull the first page of search results for any series that it finds existing issues from previous runs. This speeds up execution when you're just looking for the latest issue, which is most likely to be on the first page.
+	* onlyFirstPageForExistingSeries - If true, only look on the first page of search results for any series that it finds existing issues of. This speeds up execution because the latest issue will likely be on the first page.
 
 
 PULL LIST
