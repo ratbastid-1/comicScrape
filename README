@@ -36,19 +36,19 @@ The shipping contents of scrapeConfig.json.SAMPLE are:
 
 The fields are:
 
-	* siteUrl - the base path to getcomics.info, just in case that ever changes.
+• siteUrl - the base path to getcomics.info, just in case that ever changes.
 
-	* queryFormat - The structure of how to spell a query on GetComics, just incase ditto.
+• queryFormat - The structure of how to spell a query on GetComics, just incase ditto.
 
-	* comicsDirectory - The path on your local machine to where your comics folders live. Must be writeable by the user running this script.
+• comicsDirectory - The path on your local machine to where your comics folders live. Must be writeable by the user running this script.
 
-	* ComicvineKey - Your own Comicvine API key. Get one for free at https://comicvine.com/api.
+• ComicvineKey - Your own Comicvine API key. Get one for free at https://comicvine.com/api.
 
-	* titlesFile - The name of the file that contains your pull list series titles.
+• titlesFile - The name of the file that contains your pull list series titles.
 
-	* maxPageDepth - How deep into GetComics' search results to go when downloading a series from the beginning.
+• maxPageDepth - How deep into GetComics' search results to go when downloading a series from the beginning.
 
-	* onlyFirstPageForExistingSeries - For comics we already have issues of, only look on the first page of search results for new issues, rather than going "maxPageDepth" deep. This speeds up execution because the latest issue will likely be on the first page.
+• onlyFirstPageForExistingSeries - For comics we already have issues of, only look on the first page of search results for new issues, rather than going "maxPageDepth" deep. This speeds up execution because the latest issue will likely be on the first page.
 
 
 PULL LIST
@@ -57,19 +57,19 @@ The pull list file (named "titles.txt" by default, but renameable in scrapeconfi
 
 List these one comic per line, as per the format in the example file.
 
-No other prep is necessary; the script will attempt to set up a folder to land these issues in if it doesn't exist, and the first run will look $maxPageDepth pages deep for the first issue. To start following a new series, just put it's name in the file and run the script.
+No other prep is necessary; the script will attempt to set up a folder to save these issues in if it doesn't exist, and the first run will look $maxPageDepth pages deep for the first issue. To start following a new series, just put it's name in the file and run the script.
 
 Some special cases:
 
-	* Sometimes you have to figure out what works on GetComic's search, versus how the market is spelling a series. A popular series named "Batman/Catwoman" is appearing in GetComics as "Batman - Catwoman", so that's what to put in your pull list file. 
+1) Sometimes you have to figure out what works on GetComic's search, versus how the market is spelling a series. A popular series named "Batman/Catwoman" is appearing in GetComics as "Batman - Catwoman", so that's what to put in your pull list file. 
 
-	* Sometimes (usually due to special characters) the search term you have to use doesn't match the title as it appears in the downloaded comics. You can configure comicScrape to handle that with this special format:
+2) Sometimes (usually due to special characters) the search term you have to use doesn't match the title as it appears in the downloaded comics. You can configure comicScrape to handle that with this special format:
 
-		Search Term|File Title
+	Search Term|File Title
 
-	An example of that in the sample titles file is "Once and Future|Once & Future". If you configure both values in your file, comicScrape will use "Once and Future" to search GetComics for issues, but handle the fact that the files that come down are named "Once & Future 001 (2020).cbz", for instance. Unless the script is configured to understand this, it'll be unable to track and file these comics properly.
+An example of that in the sample titles file is "Once and Future|Once & Future". If you configure both values in your file, comicScrape will use "Once and Future" to search GetComics for issues, but handle the fact that the files that come down are named "Once & Future 001 (2020).cbz", for instance. Unless the script is configured to understand this, it'll be unable to track and file these comics properly.
 
-	* GetComics sometimes has an em-dash, or some other hyphen-looking non-hyphen thing in the name of a series. If you copy and paste the series name, you should change this to a normal hyphen in your pull list file because it messes up search URL generation.
+3) GetComics sometimes has an em-dash, or some other hyphen-looking non-hyphen thing in the name of a series. If you copy and paste the series name, you should change this to a normal hyphen in your pull list file because it messes up search URL generation.
 
 
 
@@ -99,23 +99,23 @@ COMMAND LINE SWITCHES
 
 Four command-line switches enable extra super powers, and can be used in combination:
 
-* -t or --title allows you to override the pull list file with one or more titles submitted on the command line:
+-t or --title allows you to override the pull list file with one or more titles submitted on the command line:
 	# ./comicScrape.php -t "Walking Dead" -t "Saga"
 
-* -s or --silent suppresses all command line output
+-s or --silent suppresses all command line output
 
-* -c or --config allows you to specify an alternate config file on the command line. This allows you to keep multiple sets of comics directories, each with separate pull list files.
+-c or --config allows you to specify an alternate config file on the command line. This allows you to keep multiple sets of comics directories, each with separate pull list files.
 
-* -h or --help Get help text.
+-h or --help Get help text.
 
 
 TODOS
 
- * More robust special character handling. I haven't explored what happens if a series title has an illegal character in it (e.g. "Hack/Slash"). It appears that GetComics is solving that for themselves by replacing the / with a -, but nonetheless, this is a place the script is going to be brittle.
+ • More robust special character handling. I haven't explored what happens if a series title has an illegal character in it (e.g. "Hack/Slash"). It appears that GetComics is solving that for themselves by replacing the / with a -, but nonetheless, this is a place the script is going to be brittle.
 
- * Add an optional delay factor to our hits to GetComics. Anti-hammering at least, perhaps with a humanizing jitter in the delay.
+ • Add an optional delay factor to our hits to GetComics. Anti-hammering at least, perhaps with a humanizing jitter in the delay.
 
- * Error handling. If you're going to use this, I hope you can diagnose any issues from PHP's native error messages.
+ •ß Error handling. If you're going to use this, I hope you can diagnose any issues from PHP's native error messages.
 
 
 DISCLAIMERS
