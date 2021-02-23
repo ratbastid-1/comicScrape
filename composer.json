@@ -1,0 +1,13 @@
+{
+    "name": "dan/getcomics",
+    "authors": [
+        {
+            "name": "Dan Ray",
+            "email": "dan@danray.net"
+        }
+    ],
+    "require": {
+        "cocur/slugify": "^4.0",
+        "ulrichsg/getopt-php": "^3.4"
+    }
+}
