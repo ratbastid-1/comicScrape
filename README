@@ -16,7 +16,7 @@ Complete the configuration steps below, and run on the command line.
 
 CONFIGURATION
 
-The scrapeConfig.json file contains variable necessary to configure comicScraper.php for your environment.
+The scrapeConfig.json file contains the values necessary to configure comicScraper.php for your environment.
 
 The installation comes wiht a sample called scrapeConfig.json.SAMPLE. You should populate it with values appropriate to your system, and rename it to "scrapeConfig.json".
 

@@ -2,9 +2,9 @@
 	"comments":"",
 	"siteUrl": "https://getcomics.info",
 	"queryFormat": "?s=",
-	"comicDirectory": "/Volumes/Media/Comics",
-	"ComicvineKey": "84100d15974b9f9817f78bf0aad67cfc62a0088f",
-	"titlesFile": "./titles.local",
+	"comicDirectory": "/Path/To/Comics",
+	"ComicvineKey": "YOUR-KEY",
+	"titlesFile": "./titles.txt",
 	"maxPageDepth": 3,
 	"onlyFirstPageForExistingSeries": true
 }
