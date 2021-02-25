@@ -5,6 +5,17 @@ It can be run periodically to keep active titles up to date with latest releases
 To use this script with a clean conscience, immediately go here and give generously: https://getcomics.info/support/
 
 
+GET STARTED OVERVIEW
+
+1) Clone down the repo
+2) Use Composer to install dependencies
+3) Fill in scrapeConfig.json.SAMPLE
+4) Rename scrapeConfig.json.SAMPLE to scrapeConfig.json
+5) Edit titles.txt with the names of comics you want to follow
+6) Run ./comicScrape.php
+
+
+
 INSTALLATION
 
 comicScrape's requirements are managed by Composer. Get composer at https://getcomposer.org/.
@@ -99,14 +110,21 @@ COMMAND LINE SWITCHES
 
 Four command-line switches enable extra super powers, and can be used in combination:
 
--t or --title allows you to override the pull list file with one or more titles submitted on the command line:
+-t or --title <title>
+Allows you to override the pull list file with one or more titles submitted on the command line:
 	# ./comicScrape.php -t "Walking Dead" -t "Saga"
 
--s or --silent suppresses all command line output
+-s or --silent
+Suppresses all command line output
 
--c or --config allows you to specify an alternate config file on the command line. This allows you to keep multiple sets of comics directories, each with separate pull list files.
+-m or --mail <email>
+Supply an email address to send the post-run summary to (handy for cron jobs). Requires functioning mail transport on your machine.
 
--h or --help Get help text.
+-c or --config <filename>
+Allows you to specify an alternate config file on the command line. This allows you to keep multiple sets of comics directories, each with separate pull list files.
+
+-h or --help
+Get help text.
 
 
 TODOS
@@ -117,7 +135,7 @@ TODOS
 
  • Error handling. If you're going to use this, I hope you can diagnose any issues from PHP's native error messages.
 
- • Some sort of solution for series that have "runs" that reset the issue number and are indistinguishable aside from their year. I haven't even begun to contemplate how to say I want the Deadpool series that started in 2013 vs the one that started in 2019.
+ • Some sort of solution for series that have "runs" that reset the issue number and are indistinguishable aside from their year. I haven't even begun to contemplate how to say I want the Deadpool series that started with issue #1 in 2013 vs the one that started with issue #1 in 2019.
 
 
 DISCLAIMERS
