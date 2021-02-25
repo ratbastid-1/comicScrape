@@ -24,31 +24,34 @@ if ($getopt->getOption('help')) {
     exit;
 }
 
+// get my file path (distinct from the user's cwd)
+list($scriptPath) = get_included_files();
+preg_match("/(.*\/)[^\/]+/", $scriptPath, $matches);
+$filepath = $matches[1];
+
 
 // configure ourselves with the command line options
-
 $silent = $getopt->getOption('silent') ? true : false;
-$configfile = $getopt->getOption('config') ? $getopt->getOption('config') : './scrapeConfig.json';
+$configfile = $getopt->getOption('config') ? $getopt->getOption('config') : 'scrapeConfig.json';
+$configfile = $filepath . $configfile;
 if (! is_readable($configfile) ) {
 	echo "ERROR: Config file '$configfile' is not readable.\n";
 	exit(0);
 }
-
 $config = json_decode(file_get_contents($configfile));
 
-//configure some ansi color globals:
-$bold="\033[1m";
-$regular="\033[0m";
 
 // Get our titles, from CLI or from file
 $titles = $getopt->getOption('title');
 if (count($titles) == 0) {
-	$titles = file($config->titlesFile);
+	$titles = file($filepath . '/' . $config->titlesFile);
 }
 
 // anti-explosion config, for when we download issues
 ini_set('memory_limit', '10G');
-
+//configure some ansi color globals:
+$bold="\033[1m";
+$regular="\033[0m";
 
 $savedIssues = [];
 foreach ($titles as $title) { //Go through titles from file
