@@ -13,6 +13,8 @@ $getopt = new \GetOpt\GetOpt([
     	->setDescription('Suppress all command line output.'),
     \GetOpt\Option::create('c', 'config', \GetOpt\GetOpt::REQUIRED_ARGUMENT)
     	->setDescription('Provide filename of an alternate config file.'),
+    \GetOpt\Option::create('m', 'mail', \GetOpt\GetOpt::REQUIRED_ARGUMENT)
+    	->setDescription('Email command line output to an address.'),
     \GetOpt\Option::create('h', 'help', \GetOpt\GetOpt::NO_ARGUMENT)
     	->setDescription('This help text.'),
 ]);
@@ -20,6 +22,9 @@ $getopt->process();
 if ($getopt->getOption('help')) {
     echo $getopt->getHelpText();
     exit;
+}
+if ($getopt->getOption('mail') ) {
+	ob_start();
 }
 
 // configure ourselves with the command line options
@@ -164,6 +169,13 @@ foreach ($titles as $title) { //Go through titles from file
 if (!$silent) echo "\n------\n\nRun Complete. " . count($savedIssues) . " downloaded issues.\n";
 foreach ($savedIssues as $issuepath) {
 	if (!$silent) echo " $issuepath\n";
+}
+
+
+if ($getopt->getOption('mail') ) {
+	$mailoutput = ob_get_contents();
+	ob_end_clean();
+	mail($getopt->getOption('mail'), "comicScrape results", $mailoutput);
 }
 
 
