@@ -23,9 +23,7 @@ if ($getopt->getOption('help')) {
     echo $getopt->getHelpText();
     exit;
 }
-if ($getopt->getOption('mail') ) {
-	ob_start();
-}
+
 
 // configure ourselves with the command line options
 
@@ -166,16 +164,15 @@ foreach ($titles as $title) { //Go through titles from file
 	} //end while true
 } //end foreach title
 
-if (!$silent) echo "\n------\n\nRun Complete. " . count($savedIssues) . " downloaded issues.\n";
+$summary = "Run Complete. " . count($savedIssues) . " downloaded issues.\n";
 foreach ($savedIssues as $issuepath) {
-	if (!$silent) echo " $issuepath\n";
+	$summary .= " $issuepath\n";
 }
+if (!$silent) echo "\n------\n\n" . $summary;
 
 
 if ($getopt->getOption('mail') ) {
-	$mailoutput = ob_get_contents();
-	ob_end_clean();
-	mail($getopt->getOption('mail'), "comicScrape results", $mailoutput);
+	mail($getopt->getOption('mail'), "comicScrape results", $summary);
 }
 
 
