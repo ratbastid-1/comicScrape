@@ -1,8 +1,8 @@
-comicScrape.php is a command line tool to progressively download a list of comic book titles from GetComics.info.
-
-It doesn't require authentication at getcomics, and works entirely on CLI without a browser.
+comicScrape.php is a command line tool to progressively download a list of comic book titles from GetComics.info. It works entirely on CLI without a browser.
 
 It can be run periodically to keep active titles up to date with latest releases, and has the ability to back-fill series that have several issues already out.
+
+To use this script with a clean conscience, immediately go here and give generously: https://getcomics.info/support/
 
 
 INSTALLATION
@@ -115,12 +115,14 @@ TODOS
 
  • Add an optional delay factor to our hits to GetComics. Anti-hammering at least, perhaps with a humanizing jitter in the delay.
 
- •ß Error handling. If you're going to use this, I hope you can diagnose any issues from PHP's native error messages.
+ • Error handling. If you're going to use this, I hope you can diagnose any issues from PHP's native error messages.
+
+ • Some sort of solution for series that have "runs" that reset the issue number and are indistinguishable aside from their year. I haven't even begun to contemplate how to say I want the Deadpool series that started in 2013 vs the one that started in 2019.
 
 
 DISCLAIMERS
 
-This script screen-scrapes a web resource which is somewhat uncool. Any gratitude you have toward me for this script, please express it with a contribution to GetComics.info to help keep their service up, okay?
+This script screen-scrapes a web resource that funds itself with advertising, which is somewhat uncool. Any gratitude you have toward me for this script, please express it with a contribution to GetComics.info to help keep their service up, okay?
 
 Go here and give generously: https://getcomics.info/support/
 
