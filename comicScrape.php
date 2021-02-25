@@ -33,12 +33,12 @@ $filepath = $matches[1];
 // configure ourselves with the command line options
 $silent = $getopt->getOption('silent') ? true : false;
 $configfile = $getopt->getOption('config') ? $getopt->getOption('config') : 'scrapeConfig.json';
-$configfile = $filepath . $configfile;
-if (! is_readable($configfile) ) {
+$configfilepath = $filepath . $configfile;
+if (! is_readable($configfilepath) ) {
 	echo "ERROR: Config file '$configfile' is not readable.\n";
 	exit(0);
 }
-$config = json_decode(file_get_contents($configfile));
+$config = json_decode(file_get_contents($configfilepath));
 
 
 // Get our titles, from CLI or from file
@@ -167,7 +167,7 @@ foreach ($titles as $title) { //Go through titles from file
 	} //end while true
 } //end foreach title
 
-$summary = "Run Complete. " . count($savedIssues) . " downloaded issues.\n";
+$summary = "Run Complete for config $configfile. \n" . count($savedIssues) . " downloaded issues.\n";
 foreach ($savedIssues as $issuepath) {
 	$summary .= " $issuepath\n";
 }
