@@ -102,15 +102,32 @@ foreach ($titles as $title) { //Go through titles from file
 			// valid that one of our searches might not have a second or third page, and
 			// we don't need to bug the user about that.
 
+		if ($config->onlyFirstPageForExistingSeries) {
+			// Let's check and see if our target issue is already caught--no point pulling
+			// more pages if so.
+			$slugify = new Slugify();
+			$titleSlug = $slugify->slugify($searchterm);
+			$targeturl = create_target_url($titleSlug, $wanted, $config);
+			if (preg_match("/$targeturl/", $pages, $matches)) { 
+				if (!$silent) echo "Found target issue, stopping.";
+				break;
+			}
+		}
+
 	}
 	if (!$silent) echo "\n";
+
+	$page = fopen("savedpage.txt", "w");
+	fwrite($page, $pages);
+	fclose($page);
 
 	while(true) {
 		// Clean up our inputs and define the issue slug we're going to searh for.
 		$slugify = new Slugify();
 		$titleSlug = $slugify->slugify($searchterm);
-		$targeturl = $config->siteUrl . '/[^/]+/' . $titleSlug . '-' . $wanted . '[^\d"]+';
-		$targeturl = str_replace('/', '\/', $targeturl);
+
+		$targeturl = create_target_url($titleSlug, $wanted, $config);
+		//echo "Target url: $targeturl\n";
 
 
 		if (preg_match("/$targeturl/", $pages, $matches)) { //Found it
@@ -203,4 +220,12 @@ function build_filename_from_comicvine($comicvine_search, $config) {
 	$issue_date = " ($issue_date)";
 	$filename = $cvdata->results[0]->volume->name . " " . sprintf("%03d", $cvdata->results[0]->issue_number) . $issue_title . $issue_date . '.cbz';
 	return $filename;
+}
+
+function create_target_url($titleSlug, $wanted, $config) {
+			// Clean up our inputs and define the issue slug we're going to searh for.
+		$targeturl = $config->siteUrl . '/[^/]+/' . $titleSlug . '-' . $wanted . '-\d{4}';
+		$targeturl = str_replace('/', '\/', $targeturl);
+		#echo "Targeturl: $targeturl\n";
+		return $targeturl;
 }
