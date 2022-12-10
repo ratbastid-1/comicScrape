@@ -26,8 +26,7 @@ The shipping contents of scrapeConfig.json.SAMPLE are:
 {
 	"siteUrl": "https://getcomics.info",
 	"queryFormat": "?s=",
-	"comicDirectory": "/Path/To/Comics",
-	"ComicvineKey": "YOUR-KEY",
+	"comicDirectory": "/Path/To/Comics"
 	"titlesFile": "./titles.txt",
 	"maxPageDepth": 3,
 	"onlyFirstPageForExistingSeries": true
@@ -41,8 +40,6 @@ The fields are:
 • queryFormat - The structure of how to spell a query on GetComics, just incase ditto.
 
 • comicsDirectory - The path on your local machine to where your comics folders live. Must be writeable by the user running this script.
-
-• ComicvineKey - Your own Comicvine API key. Get one for free at https://comicvine.com/api.
 
 • titlesFile - The name of the file that contains your pull list series titles.
 
@@ -88,9 +85,9 @@ When you launch the script, it will:
 	- Find the folder named for them in your "comicsDirectory". Create the series directory if it doesn't exist.
 	- Look through that folder for the latest issue it contains. (By highest issue number.)
 	- Search GetComics for the title, and get the first "maxPageDepth" pages
-	- Search through those downloaded pages for links to issues with higer issue numbers than your latest one
-	- Attempt to download those, and store them in the series folder
-	- Parse the filename out of the response headers. If this fails, hit Comicvine for a reasonable guess at a filename.
+	- As each page lands, search it for the issue we're looking for. If we find it, stop pulling search pages and start downloading issues.
+	- As issues download, store them in the series folder
+	- Parse the filename out of the response headers. If this fails, assemble a reasonable guess at a filename.
 
 It will report on its progress in a cheerful manner, and at the end will dump the list of files it has just added to your directories.
 
@@ -103,6 +100,8 @@ Four command-line switches enable extra super powers, and can be used in combina
 	# ./comicScrape.php -t "Walking Dead" -t "Saga"
 
 -s or --silent suppresses all command line output
+
+-v or --verbose turns on some debug/process output
 
 -c or --config allows you to specify an alternate config file on the command line. This allows you to keep multiple sets of comics directories, each with separate pull list files.
 

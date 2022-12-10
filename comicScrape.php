@@ -9,12 +9,18 @@ use Cocur\Slugify\Slugify;
 $getopt = new \GetOpt\GetOpt([
     \GetOpt\Option::create('t', 'title', \GetOpt\GetOpt::MULTIPLE_ARGUMENT)
     	->setDescription('Provide one or more titles to run instead of using the configured titles file. Can appear more than once (I.e. -t "Walking Dead" -t "Saga")'),
+    \GetOpt\Option::create('a', 'add')
+    	->setDescription('In combination with -t, add these command-line titles to the titles file.' . "\n"),
     \GetOpt\Option::create('s', 'silent')
     	->setDescription('Suppress all command line output.'),
+    \GetOpt\Option::create('v', 'verbose')
+    	->setDescription('Put out lots of process and debugging output.' . "\n"),
     \GetOpt\Option::create('c', 'config', \GetOpt\GetOpt::REQUIRED_ARGUMENT)
     	->setDescription('Provide filename of an alternate config file.'),
+    \GetOpt\Option::create('g', 'grep', \GetOpt\GetOpt::REQUIRED_ARGUMENT)
+    	->setDescription('Search title file for the given string, and quit.'),
     \GetOpt\Option::create('m', 'mail', \GetOpt\GetOpt::REQUIRED_ARGUMENT)
-    	->setDescription('Email command line output to an address.'),
+    	->setDescription('Email command line output to an address.' . "\n"),
     \GetOpt\Option::create('h', 'help', \GetOpt\GetOpt::NO_ARGUMENT)
     	->setDescription('This help text.'),
 ]);
@@ -32,6 +38,12 @@ $filepath = $matches[1];
 
 // configure ourselves with the command line options
 $silent = $getopt->getOption('silent') ? true : false;
+$GLOBALS['silent'] = $silent;
+$verbose = $getopt->getOption('verbose') ? true : false;
+$GLOBALS['verbose'] = $verbose;
+$addTitle = $getopt->getOption('add') ? true : false;
+$GLOBALS['addTitle'] = $addTitle;
+
 $configfile = $getopt->getOption('config') ? $getopt->getOption('config') : 'scrapeConfig.json';
 $configfilepath = $filepath . $configfile;
 if (! is_readable($configfilepath) ) {
@@ -41,11 +53,34 @@ if (! is_readable($configfilepath) ) {
 $config = json_decode(file_get_contents($configfilepath));
 
 
+
 // Get our titles, from CLI or from file
 $titles = $getopt->getOption('title');
+$clititles = $titles ? true : false;
+if ($addTitle && ! $clititles) {
+	echo "ERROR: -a only functions in the context of a command-line title provided with -t\n";
+	exit(0);
+}
 if (count($titles) == 0) {
 	$titles = file($filepath . '/' . $config->titlesFile);
 }
+
+if ($getopt->getOption('grep')) {
+	$result = preg_grep("/" . $getopt->getOption('grep') . "/i", $titles);
+	
+	if (count($result) > 0) {	
+		$trimmed = [];
+		foreach ($result as $hit) {
+			$trimmed[] = rtrim(ltrim($hit));
+		}
+		echo "Found: " . implode(', ', $trimmed) . "\n";
+	}
+	else {
+		echo "Not Found\n";
+	}
+	exit(0);	
+}
+
 
 // anti-explosion config, for when we download issues
 ini_set('memory_limit', '10G');
@@ -56,6 +91,14 @@ $regular="\033[0m";
 $savedIssues = [];
 foreach ($titles as $title) { //Go through titles from file
 
+	// Handle -a argument, appending a CLI title to the titles file, if it's not already there.
+	if ($clititles && $addTitle) {
+		$existing = file($filepath . '/' . $config->titlesFile);
+		$result = preg_grep('/^' . $title . "\n/", $existing);
+		if (count($result) == 0) {
+			file_put_contents($filepath . '/' . $config->titlesFile, $title . "\n", FILE_APPEND);
+		}
+	}
 	// handle case where files have to be searched with different strings
 	// than the download filename ("Once & Future" has to be searched "Once and Future")
 	$searchterm = rtrim($title);
@@ -142,8 +185,36 @@ foreach ($titles as $title) { //Go through titles from file
 			preg_match($targettag, $issuepage, $matches);
 			$issueURL = $matches[1];
 		
-			// If we didn't find our target url, break this loop and try the next page.	
 			if (! $issueURL) {
+
+				// If we didn't get a download now link we'll try the Read Online
+				//echo "\n\n$issuepage\n\n";
+
+
+				$targettag = '/href="([^"]+)"[^>]+title="Read Online"/';
+				preg_match($targettag, $issuepage, $matches);
+				$readonlineURL = $matches[1];
+				echo "Readonline url: $readonlineURL\n";
+				$readonlinepage = file_get_contents($readonlineURL);
+				$submatches = array();
+				preg_match_all('/data-src=\' ([^ ]+) \'/', $readonlinepage, $submatches);
+				
+				$pageno = 0;
+				if (count($submatches[1]) > 0) {
+					foreach ($submatches[1] as $pageurl) {
+						file_put_contents(++$pageno . ".jpg", file_get_contents($pageurl));
+					}
+					$fullpath = $config->comicDirectory . '/' . $title . '/' . $title  . ' '. sprintf("%03d", $wanted) . '.cbr';
+					exec('rar a -ma4 \'' . $fullpath . '\' *.jpg; rm *.jpg');
+					$savedIssues[] = $fullpath;
+
+				}
+				else {
+
+					echo "Something strange about this download page; bailing on $titleSlug\n";
+					break;
+				}
+				$wanted++;
 				continue;
 			}
 
@@ -155,9 +226,10 @@ foreach ($titles as $title) { //Go through titles from file
 			       )
 			);
 			$context = stream_context_create($opts);
+			stream_context_set_params($context, array("notification" => "stream_notification_callback"));
 
 
-			if (!$silent) echo "  Found issue $wanted. Downloading... ";
+			if (!$silent) echo "  Found issue $wanted. Downloading... \n";
 
 			//Get the actual thing and save it.
 			$issuebinary = file_get_contents($issueURL, false, $context);
@@ -166,20 +238,25 @@ foreach ($titles as $title) { //Go through titles from file
 			$filename = false;
 			$filename = get_real_filename($http_response_header, $issueURL);
 			if (!$filename) {
-				// Getting the filename from the HTTP response header failed, so hit comicvine for details about this issue
-				$filename = build_filename_from_comicvine(urlencode($searchterm . " " . $wanted), $config);
-
+				if (!$silent) echo "\nError getting filename. Composing it on my own. ";
+				$extension = is_zip($issuebinary) ? '.cbz' : '.cbr';
+				$filename = $title . ' ' . sprintf("%03d", $wanted) . $extension;
+	
 			}
-			if (!$silent) echo "  Done. Filename: $filename\n";
+			if (!$silent) echo "\n";
+			if (!$silent) echo "Saved: $filename\n";
 			$fullpath = $config->comicDirectory . '/' . $title . '/' . $filename;
 			$savedIssues[] = $fullpath;
+
+
 
 			file_put_contents($fullpath, $issuebinary);
 
 			// Set up flags and switches for next loop
 			$wanted++;
 			continue;
-		} // end Found It 
+		}
+
 		break; //We fell through here without finding a "next" issue, so bail.
 	} //end while true
 } //end foreach title
@@ -198,6 +275,7 @@ if ($getopt->getOption('mail') ) {
 
 function get_real_filename($headers,$url)
 {
+	if ($GLOBALS['verbose']) print_r($headers);
     foreach($headers as $header)
     {
         if (strpos(strtolower($header),'location') !== false)
@@ -208,19 +286,6 @@ function get_real_filename($headers,$url)
     }
 }
 
-function build_filename_from_comicvine($comicvine_search, $config) {
-	$cvdoc = file_get_contents("https://comicvine.gamespot.com/api/search/?api_key=$config->ComicvineKey&format=json&sort=name:asc&resources=issue&query=" . urlencode($comicvine_search));
-	$cvdata = json_decode($cvdoc);
-	$issue_title = $cvdata->results[0]->name;
-	if ($issue_title) {
-		$issue_title = " - $issue_title";
-	}
-	$issue_date = $cvdata->results[0]->cover_date;
-	$issue_date = substr($issue_date, 0, 4);
-	$issue_date = " ($issue_date)";
-	$filename = $cvdata->results[0]->volume->name . " " . sprintf("%03d", $cvdata->results[0]->issue_number) . $issue_title . $issue_date . '.cbz';
-	return $filename;
-}
 
 function create_target_url($titleSlug, $wanted, $config) {
 			// Clean up our inputs and define the issue slug we're going to searh for.
@@ -228,4 +293,55 @@ function create_target_url($titleSlug, $wanted, $config) {
 		$targeturl = str_replace('/', '\/', $targeturl);
 		#echo "Targeturl: $targeturl\n";
 		return $targeturl;
+}
+
+
+function stream_notification_callback($notification_code, $severity, $message, $message_code, $bytes_transferred, $bytes_max) {
+    static $filesize = null;
+    $silent = $GLOBALS['silent'];
+    $verbose = $GLOBALS['verbose'];
+
+    switch($notification_code) {
+    case STREAM_NOTIFY_RESOLVE:
+    case STREAM_NOTIFY_AUTH_REQUIRED:
+    case STREAM_NOTIFY_COMPLETED:
+    case STREAM_NOTIFY_FAILURE:
+    case STREAM_NOTIFY_AUTH_RESULT:
+        /* Ignore */
+        break;
+
+    case STREAM_NOTIFY_REDIRECTED:
+        if ($verbose) echo "Being redirected to: ", $message, "\n";
+        break;
+
+    case STREAM_NOTIFY_CONNECT:
+        if ($verbose) echo "Connected...\n";
+        break;
+
+    case STREAM_NOTIFY_FILE_SIZE_IS:
+        $filesize = $bytes_max;
+        if ($verbose) echo "Filesize: ", $filesize, "\n";
+        break;
+
+    case STREAM_NOTIFY_MIME_TYPE_IS:
+        if ($verbose) echo "Mime-type: ", $message, "\n";
+        break;
+
+    case STREAM_NOTIFY_PROGRESS:
+        if ($bytes_transferred > 0) {
+            if (!isset($filesize)) {
+                if (!$silent) printf("\rUnknown filesize.. %2d kb done..", $bytes_transferred/1024);
+            } else {
+                $length = (int)(($bytes_transferred/$filesize)*100);
+                if (!$silent) printf("\r[%-100s] %d%% (%2d/%2d kb)", str_repeat("=", $length). ">", $length, ($bytes_transferred/1024), $filesize/1024);
+            }
+        }
+        break;
+    }
+}
+
+
+function is_zip(String $data) {
+    $sectors = explode("\x50\x4b\x01\x02", $data);
+    return count($sectors) > 1 ? true : false;
 }
