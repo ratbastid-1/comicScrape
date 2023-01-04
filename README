@@ -131,12 +131,15 @@ Allows you to specify an alternate config file on the command line. This allows 
 Get help text.
 
 
-##USAGE EXAMPLES
+## USAGE EXAMPLES
 
-Stick this in your crontab to auto-run this at noon and midnight, and email yourself results:
+1. Stick this in your crontab to auto-run this at noon and midnight, and email yourself results:
 
     1 */12 * * * ~/Documents/comicScrape/comicScrape.php -sm you@there.com
     
+2. When you find a new series you're interested in and want to grab it all up to date AND start tracking it:
+
+    ./comicScrape.php -t "Series Title" -a
 
 
 
