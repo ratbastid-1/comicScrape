@@ -5,7 +5,7 @@ It can be run periodically to keep active titles up to date with latest releases
 To use this script with a clean conscience, immediately go here and give generously: https://getcomics.info/support/
 
 
-GET STARTED OVERVIEW
+## GET STARTED OVERVIEW
 
 1) Clone down the repo
 2) Use Composer to install dependencies
@@ -15,8 +15,7 @@ GET STARTED OVERVIEW
 6) Run ./comicScrape.php
 
 
-
-INSTALLATION
+## INSTALLATION
 
 comicScrape's requirements are managed by Composer. Get composer at https://getcomposer.org/.
 
@@ -25,7 +24,7 @@ Clone down the repository, change to its directory and run 'composer install'.
 Complete the configuration steps below, and run on the command line.
 
 
-CONFIGURATION
+## CONFIGURATION
 
 The scrapeConfig.json file contains the values necessary to configure comicScraper.php for your environment.
 
@@ -59,7 +58,7 @@ The fields are:
 • onlyFirstPageForExistingSeries - For comics we already have issues of, only look on the first page of search results for new issues, rather than going "maxPageDepth" deep. This speeds up execution because the latest issue will likely be on the first page.
 
 
-PULL LIST
+## PULL LIST
 
 The pull list file (named "titles.txt" by default, but renameable in scrapeconfig.json) should contain a list of the titles you want the script to keep up with.
 
@@ -81,7 +80,7 @@ An example of that in the sample titles file is "Once and Future|Once & Future".
 
 
 
-RUNNING THE SCRIPT
+## RUNNING THE SCRIPT
 
 Run the script from the command line:
 
@@ -103,7 +102,7 @@ When you launch the script, it will:
 It will report on its progress in a cheerful manner, and at the end will dump the list of files it has just added to your directories.
 
 
-COMMAND LINE SWITCHES
+## COMMAND LINE SWITCHES
 
 Four command-line switches enable extra super powers, and can be used in combination:
 
@@ -132,7 +131,16 @@ Allows you to specify an alternate config file on the command line. This allows 
 Get help text.
 
 
-TODOS
+##USAGE EXAMPLES
+
+Stick this in your crontab to auto-run this at noon and midnight, and email yourself results:
+
+    1 */12 * * * ~/Documents/comicScrape/comicScrape.php -sm you@there.com
+    
+
+
+
+## TODOS
 
  • More robust special character handling. I haven't explored what happens if a series title has an illegal character in it (e.g. "Hack/Slash"). It appears that GetComics is solving that for themselves by replacing the / with a -, but nonetheless, this is a place the script is going to be brittle.
 
@@ -143,7 +151,7 @@ TODOS
  • Some sort of solution for series that have "runs" that reset the issue number and are indistinguishable aside from their year. I haven't even begun to contemplate how to say I want the Deadpool series that started with issue #1 in 2013 vs the one that started with issue #1 in 2019.
 
 
-DISCLAIMERS
+## DISCLAIMERS
 
 This script screen-scrapes a web resource that funds itself with advertising. Current case law seems to indicate that this is not illegal, but it is still somewhat uncool. Any gratitude you have toward me for this script, please express it with a contribution to GetComics.info to help keep their service up, okay?
 
