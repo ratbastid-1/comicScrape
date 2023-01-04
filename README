@@ -111,6 +111,12 @@ Four command-line switches enable extra super powers, and can be used in combina
 Allows you to override the pull list file with one or more titles submitted on the command line:
 	# ./comicScrape.php -t "Walking Dead" -t "Saga"
 
+-a 
+Used in conjuniction with a title expressed in a -t switch, this switch will cause comicScrape to add this title to the end of the pull list. It does not check if this title already exists in the file
+
+-g <string>
+Greps the pull list for the given string, returns a list of matches
+
 -s or --silent
 Suppresses all command line output
 
